@@ -1,69 +1,118 @@
-import Image from "next/image";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12">
+      {/* Hero Section */}
+      <div className="max-w-4xl w-full text-center space-y-8">
+        {/* Glowing Badge & Logo */}
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="relative group">
+            <div className="absolute -inset-2 bg-gradient-to-r from-rose-500 via-pink-500 to-indigo-500 rounded-3xl blur-xl opacity-60 group-hover:opacity-100 transition duration-500"></div>
+            <div className="relative p-3 bg-[#0B1026] rounded-2xl border border-pink-500/30 shadow-2xl">
+              <Image
+                src="/assets/team-chatgpt-logo.png"
+                alt="Logo Team ChatGPT"
+                width={96}
+                height={96}
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs sm:text-sm font-semibold tracking-wide">
+            <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+            TEAM CHATGPT • DỰ ÁN TÂM LÝ HỌC & RA QUYẾT ĐỊNH
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="space-y-3">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
+            NHIỆM VỤ <br className="sm:hidden" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-pink-400 to-indigo-400">
+              MẶT TRĂNG
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-sm sm:text-base text-cyan-400 font-mono tracking-widest uppercase">
+            NASA STARCHILD: PROBLEMS IN SPACE • 150+ PHI HÀNH GIA
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Narrative Scenario */}
+        <div className="glass-panel-glow p-6 sm:p-8 rounded-2xl max-w-2xl mx-auto text-left relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div className="flex items-center gap-2 text-cyan-300 text-xs sm:text-sm font-bold tracking-wider uppercase mb-3">
+            <span className="text-base">🚨</span> TÌNH HUỐNG KHẨN CẤP
+          </div>
+          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Bạn là thành viên phi hành đoàn thám hiểm Mặt Trăng. Tàu gặp sự cố và phải hạ cánh khẩn cấp trên phần Mặt Trăng được chiếu sáng, cách căn cứ khoảng <span className="text-white font-bold">120 km</span>. Tàu bị hư hại và chỉ còn <span className="text-cyan-300 font-bold">15 vật phẩm</span> nguyên vẹn.
+          </p>
+          <div className="mt-4 pt-4 border-t border-slate-700/60 flex flex-wrap items-center justify-between text-xs sm:text-sm text-slate-400 gap-2">
+            <span>⏱️ Thời gian: <strong className="text-white">10 phút</strong></span>
+            <span>🎯 Nhiệm vụ: <strong className="text-white">Xếp hạng 1 → 15</strong></span>
+            <span>👥 Quy mô: <strong className="text-white">Toàn bộ lớp học</strong></span>
+          </div>
         </div>
-      </main>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+          <Link
+            href="/join"
+            className="w-full sm:w-auto px-8 py-4 text-base sm:text-lg font-bold text-white bg-gradient-to-r from-rose-500 via-pink-500 to-indigo-600 rounded-2xl shadow-[0_0_25px_rgba(244,63,94,0.5)] hover:shadow-[0_0_35px_rgba(244,63,94,0.8)] transition-all hover:scale-105 active:scale-95 text-center"
+          >
+            🚀 Tham Gia Nhiệm Vụ Ngay
+          </Link>
+          <Link
+            href="/rules"
+            className="w-full sm:w-auto px-6 py-4 text-base font-semibold text-slate-300 hover:text-white glass-panel hover:bg-slate-800/80 rounded-2xl transition-all text-center border border-slate-700/60"
+          >
+            📜 Xem Luật Chơi
+          </Link>
+          <Link
+            href="/admin"
+            className="w-full sm:w-auto px-6 py-4 text-base font-semibold text-indigo-300 hover:text-indigo-200 glass-panel hover:bg-indigo-950/40 rounded-2xl transition-all text-center border border-indigo-500/30"
+          >
+            🛡️ Bảng Điều Khiển Host
+          </Link>
+        </div>
+
+        {/* Feature Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left">
+          <div className="glass-panel p-5 rounded-xl border border-indigo-500/20">
+            <div className="text-2xl mb-2">⚖️</div>
+            <h3 className="font-bold text-white text-sm mb-1">Chuẩn Chuyên Gia NASA</h3>
+            <p className="text-xs text-slate-400">
+              Đối chiếu trực tiếp với đáp án chính thức từ NASA StarChild & nghiên cứu ra quyết định của Hall & Watson (1970).
+            </p>
+          </div>
+          <div className="glass-panel p-5 rounded-xl border border-indigo-500/20">
+            <div className="text-2xl mb-2">⚡</div>
+            <h3 className="font-bold text-white text-sm mb-1">Đồng Bộ Thời Gian Thực</h3>
+            <p className="text-xs text-slate-400">
+              Hỗ trợ hơn 150 người cùng tham gia, timer đồng bộ theo chuẩn máy chủ và chống gian lận chỉnh giờ thiết bị.
+            </p>
+          </div>
+          <div className="glass-panel p-5 rounded-xl border border-indigo-500/20">
+            <div className="text-2xl mb-2">🐱</div>
+            <h3 className="font-bold text-white text-sm mb-1">Meme & Cà Khịa Gen Z</h3>
+            <p className="text-xs text-slate-400">
+              15 phiên bản bình luận hài hước độc quyền cùng 3 linh vật mèo meme: Sống, Sống Hấp Hối và Hẹo.
+            </p>
+          </div>
+        </div>
+
+        {/* Presenter Opening Script hint */}
+        <div className="mt-8 p-4 rounded-xl bg-slate-900/50 border border-slate-800 text-left text-xs text-slate-400">
+          <span className="font-semibold text-slate-300">💡 Gợi ý dành cho MC / Thuyết trình:</span>
+          <p className="mt-1 italic">
+            “Trước khi vào phần lý thuyết, team ChatGPT muốn thử một chuyện nhỏ với cả lớp: nếu phải sinh tồn trên Mặt Trăng, mọi người có biết cái gì cần giữ lại đầu tiên không? Mời mọi người bấm tham gia hoặc quét mã QR!”
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

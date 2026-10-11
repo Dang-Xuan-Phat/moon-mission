@@ -1,0 +1,471 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import QRCode from 'qrcode';
+import { SessionData, LeaderboardEntry } from '@/types/game';
+
+export default function AdminPage() {
+  const [adminPassword, setAdminPassword] = useState('admin123');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState('');
+
+  // Host room state
+  const [roomCode, setRoomCode] = useState('NASA01');
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [session, setSession] = useState<SessionData | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [stats, setStats] = useState<{ total: number; songCount: number; hapHoiCount: number; heoCount: number; avgScore: number } | null>(null);
+  const [qrUrl, setQrUrl] = useState<string>('');
+  const [actionMsg, setActionMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Authenticate Host
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminPassword === 'admin123' || adminPassword.length >= 4) {
+      setIsAuthenticated(true);
+      setAuthError('');
+      fetchSessionDetails(roomCode);
+    } else {
+      setAuthError('Mật khẩu quản trị viên không chính xác.');
+    }
+  };
+
+  // Fetch session & leaderboard
+  const fetchSessionDetails = async (codeToFetch: string) => {
+    if (!codeToFetch) return;
+    try {
+      const res = await fetch(`/api/session/${codeToFetch}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSession(data.session);
+
+        // Fetch leaderboard for host (pass adminPassword)
+        const lbRes = await fetch(`/api/session/${codeToFetch}/leaderboard?adminPassword=${adminPassword}`);
+        if (lbRes.ok) {
+          const lbData = await lbRes.json();
+          setLeaderboard(lbData.leaderboard || []);
+          setStats(lbData.stats || null);
+        }
+
+        // Generate Host Projection QR
+        if (typeof window !== 'undefined') {
+          const joinUrl = `${window.location.origin}/join?room=${codeToFetch}`;
+          const qr = await QRCode.toDataURL(joinUrl, {
+            margin: 2,
+            width: 260,
+            color: { dark: '#070B1A', light: '#5EEBFF' },
+          });
+          setQrUrl(qr);
+        }
+      } else {
+        setSession(null);
+      }
+    } catch (err: any) {
+      console.error('Fetch error:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && roomCode) {
+      fetchSessionDetails(roomCode);
+      pollIntervalRef.current = setInterval(() => {
+        fetchSessionDetails(roomCode);
+      }, 3000);
+    }
+
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+    };
+  }, [isAuthenticated, roomCode, adminPassword]);
+
+  // Create new session
+  const handleCreateRoom = async () => {
+    setIsCreating(true);
+    setErrorMsg('');
+    setActionMsg('');
+
+    try {
+      const res = await fetch('/api/session/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: roomCode,
+          isTest: isTestMode,
+          adminPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi tạo phòng.');
+
+      setSession(data.session);
+      setRoomCode(data.session.code);
+      setActionMsg(`Đã tạo phòng thành công: ${data.session.code}`);
+      fetchSessionDetails(data.session.code);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Lỗi khi tạo phòng.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // Host Action controls
+  const handleHostControl = async (action: string) => {
+    setErrorMsg('');
+    setActionMsg('');
+
+    if (action === 'reset') {
+      const confirmed = window.confirm(
+        'Bạn có chắc chắn muốn RESET phòng? Trạng thái phòng sẽ quay về sảnh chờ (LOBBY).'
+      );
+      if (!confirmed) return;
+    }
+
+    try {
+      const res = await fetch(`/api/session/${roomCode}/control`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          adminPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi thực thi lệnh.');
+
+      setSession(data.session);
+      setActionMsg(`Đã thực hiện: ${action.toUpperCase()}`);
+      fetchSessionDetails(roomCode);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Lỗi khi điều khiển phòng.');
+    }
+  };
+
+  // CSV Export download
+  const handleExportCSV = () => {
+    if (!roomCode) return;
+    window.open(`/api/session/${roomCode}/export?adminPassword=${adminPassword}`, '_blank');
+  };
+
+  // Login view
+  if (!isAuthenticated) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+        <div className="max-w-md w-full glass-panel-glow p-8 rounded-2xl space-y-6">
+          <div className="text-center space-y-2">
+            <span className="text-3xl">🛡️</span>
+            <h1 className="text-2xl font-black text-white">Xác Thực Host / Quản Trị</h1>
+            <p className="text-xs text-slate-300">
+              Nhập mật khẩu Host để điều khiển phiên và máy chiếu lớp học.
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            {authError && (
+              <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs">
+                {authError}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Mật khẩu Host (Mặc định: admin123)
+              </label>
+              <input
+                type="password"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                placeholder="Nhập mật khẩu..."
+                className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-cyan-400"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-rose-500 to-indigo-600 shadow-lg hover:scale-105 transition"
+            >
+              Đăng Nhập Bảng Điều Khiển
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Admin Dashboard view
+  return (
+    <div className="flex-1 py-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full space-y-8">
+      {/* Top Banner */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-indigo-500/20 pb-6">
+        <div>
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
+            // HOST COMMAND CENTER
+          </span>
+          <h1 className="text-3xl font-black text-white mt-1">
+            Bảng Quản Trị Nhiệm Vụ Mặt Trăng
+          </h1>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Phòng hiện tại: <strong className="text-cyan-300 font-mono text-sm">{roomCode}</strong> • Trạng thái: <span className="font-bold text-white">{session?.status || 'Chưa khởi tạo'}</span>
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportCSV}
+            className="px-4 py-2.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center gap-2"
+          >
+            <span>📥</span> Xuất File CSV
+          </button>
+          <button
+            onClick={() => setIsAuthenticated(false)}
+            className="px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-400 text-xs font-semibold transition"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+
+      {actionMsg && (
+        <div className="p-3.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs flex items-center gap-2">
+          <span>✓</span>
+          <span>{actionMsg}</span>
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+          <span>⚠️</span>
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      {/* Grid: Room Info & Controls + Projection QR */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Controls & Room Management */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Room Configuration Card */}
+          <div className="glass-panel p-6 rounded-2xl space-y-4">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <span>⚙️</span> Thiết Lập Mã Phòng
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] text-slate-400 mb-1">Mã phòng (6 ký tự)</label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={roomCode}
+                  onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                  className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white font-mono text-center text-sm font-bold uppercase"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-5">
+                <input
+                  type="checkbox"
+                  id="testMode"
+                  checked={isTestMode}
+                  onChange={(e) => setIsTestMode(e.target.checked)}
+                  className="rounded border-slate-700 text-rose-500 focus:ring-0"
+                />
+                <label htmlFor="testMode" className="text-xs text-slate-300 cursor-pointer">
+                  Chế độ chạy thử (Test)
+                </label>
+              </div>
+
+              <div className="pt-4 sm:pt-4">
+                <button
+                  type="button"
+                  onClick={handleCreateRoom}
+                  disabled={isCreating}
+                  className="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-md"
+                >
+                  {isCreating ? 'Đang tạo...' : '+ Tạo Phòng Mới'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Realtime Action Controls Card */}
+          <div className="glass-panel-glow p-6 rounded-2xl space-y-4">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <span>🎮</span> Bảng Điều Khiển Trực Tiếp
+            </h3>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {/* Start Now */}
+              <button
+                type="button"
+                onClick={() => handleHostControl('start_now')}
+                className="p-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex flex-col items-center gap-1.5 transition active:scale-95 text-center"
+              >
+                <span className="text-xl">▶️</span>
+                <span>Bắt Đầu Ngay (10 Phút)</span>
+              </button>
+
+              {/* Lock/Unlock Join */}
+              <button
+                type="button"
+                onClick={() => handleHostControl(session?.join_locked ? 'unlock_join' : 'lock_join')}
+                className="p-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold flex flex-col items-center gap-1.5 transition active:scale-95 text-center"
+              >
+                <span className="text-xl">{session?.join_locked ? '🔓' : '🔒'}</span>
+                <span>{session?.join_locked ? 'Mở Khóa Join' : 'Khóa Vào Phòng'}</span>
+              </button>
+
+              {/* Reveal Results */}
+              <button
+                type="button"
+                onClick={() => handleHostControl('reveal')}
+                className="p-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-300 text-xs font-bold flex flex-col items-center gap-1.5 transition active:scale-95 text-center"
+              >
+                <span className="text-xl">🏆</span>
+                <span>Công Bố Kết Quả & BXH</span>
+              </button>
+
+              {/* Reset Room */}
+              <button
+                type="button"
+                onClick={() => handleHostControl('reset')}
+                className="p-3 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold flex flex-col items-center gap-1.5 transition active:scale-95 text-center"
+              >
+                <span className="text-xl">🔄</span>
+                <span>Reset Phiên Chơi</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Col: Classroom Projection QR & Link */}
+        <div className="glass-panel p-6 rounded-2xl flex flex-col items-center text-center space-y-4">
+          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">
+            Chiếu Lên Màn Hình Cho Lớp Quét
+          </h3>
+
+          {qrUrl ? (
+            <div className="p-3 bg-cyan-950 rounded-2xl border-2 border-cyan-400/40 shadow-[0_0_25px_rgba(94,235,255,0.2)]">
+              <img src={qrUrl} alt="Classroom QR" className="w-56 h-56 rounded-xl" />
+            </div>
+          ) : (
+            <div className="w-56 h-56 rounded-xl bg-slate-900 flex items-center justify-center text-slate-500 text-xs">
+              Đang tạo QR...
+            </div>
+          )}
+
+          <div className="space-y-1">
+            <p className="text-xs text-slate-400">Mã phòng tham gia:</p>
+            <p className="text-3xl font-black font-mono tracking-widest text-cyan-300">
+              {roomCode}
+            </p>
+          </div>
+
+          <div className="text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 break-all w-full">
+            {typeof window !== 'undefined' ? `${window.location.origin}/join?room=${roomCode}` : ''}
+          </div>
+        </div>
+      </div>
+
+      {/* Class Statistics Overview */}
+      {stats && (
+        <div className="glass-panel p-6 rounded-2xl space-y-4">
+          <h3 className="text-base font-bold text-white flex items-center gap-2">
+            <span>📊</span> Thống Kê Điểm Số & Phân Bố Sinh Tồn (Thực tế)
+          </h3>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+              <p className="text-xs text-slate-400">Tổng bài nộp</p>
+              <p className="text-2xl font-black text-white font-mono">{stats.total}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-xs text-emerald-300">🟢 Sống (70-100đ)</p>
+              <p className="text-2xl font-black text-emerald-400 font-mono">{stats.songCount}</p>
+              <p className="text-[10px] text-slate-400 mt-1">
+                {stats.total ? Math.round((stats.songCount / stats.total) * 100) : 0}%
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <p className="text-xs text-amber-300">🟡 Sống hấp hối (40-69đ)</p>
+              <p className="text-2xl font-black text-amber-400 font-mono">{stats.hapHoiCount}</p>
+              <p className="text-[10px] text-slate-400 mt-1">
+                {stats.total ? Math.round((stats.hapHoiCount / stats.total) * 100) : 0}%
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
+              <p className="text-xs text-rose-300">🔴 Hẹo (0-39đ)</p>
+              <p className="text-2xl font-black text-rose-400 font-mono">{stats.heoCount}</p>
+              <p className="text-[10px] text-slate-400 mt-1">
+                {stats.total ? Math.round((stats.heoCount / stats.total) * 100) : 0}%
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Leaderboard Table */}
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-white flex items-center gap-2">
+            <span>📋</span> Bảng Xếp Hạng & Bài Nộp ({leaderboard.length} thí sinh)
+          </h3>
+          <button
+            onClick={() => fetchSessionDetails(roomCode)}
+            className="text-xs text-cyan-400 hover:text-cyan-300 transition"
+          >
+            ↻ Làm mới
+          </button>
+        </div>
+
+        {leaderboard.length === 0 ? (
+          <p className="text-xs text-slate-400 text-center py-8">
+            Chưa có bài nộp nào trong phòng này. Người chơi sẽ xuất hiện sau khi nộp bài.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs sm:text-sm">
+              <thead className="bg-slate-900/80 text-slate-400 uppercase text-[11px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th className="py-2.5 px-3">Hạng</th>
+                  <th className="py-2.5 px-3">Tên người chơi</th>
+                  <th className="py-2.5 px-3 text-center">Điểm sống sót</th>
+                  <th className="py-2.5 px-3 text-center">Sai lệch E</th>
+                  <th className="py-2.5 px-3 text-right">Trạng thái</th>
+                  <th className="py-2.5 px-3 text-right">Giờ nộp</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                {leaderboard.map((entry, idx) => (
+                  <tr key={idx} className="hover:bg-slate-800/30">
+                    <td className="py-2.5 px-3 font-mono font-bold">#{entry.rank}</td>
+                    <td className="py-2.5 px-3 font-medium text-white">{entry.display_name}</td>
+                    <td className="py-2.5 px-3 text-center font-mono font-bold text-cyan-300">
+                      {entry.survival_score}
+                    </td>
+                    <td className="py-2.5 px-3 text-center font-mono text-slate-400">
+                      {entry.error_score}
+                    </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 border border-white/10">
+                        {entry.status}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-right text-slate-500 font-mono text-xs">
+                      {new Date(entry.submitted_at).toLocaleTimeString('vi-VN')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
