@@ -36,7 +36,7 @@ async function runLoadTest() {
     const createRes = await fetch(`${BASE_URL}/api/session/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: ROOM_CODE, isTest: true, adminPassword: 'admin123' }),
+      body: JSON.stringify({ code: ROOM_CODE, isTest: true, adminPassword: '02092007' }),
     });
     const createData = await createRes.json();
     console.log(`   ✓ Phòng đã tạo:`, createData.session?.code);
@@ -45,7 +45,7 @@ async function runLoadTest() {
     await fetch(`${BASE_URL}/api/session/${ROOM_CODE}/control`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'start_now', adminPassword: 'admin123' }),
+      body: JSON.stringify({ action: 'start_now', adminPassword: '02092007' }),
     });
     console.log(`   ✓ Trạng thái phòng: RUNNING\n`);
   } catch (err) {
@@ -135,10 +135,10 @@ async function runLoadTest() {
   await fetch(`${BASE_URL}/api/session/${ROOM_CODE}/control`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'reveal', adminPassword: 'admin123' }),
+    body: JSON.stringify({ action: 'reveal', adminPassword: '02092007' }),
   });
 
-  const lbRes = await fetch(`${BASE_URL}/api/session/${ROOM_CODE}/leaderboard?adminPassword=admin123`);
+  const lbRes = await fetch(`${BASE_URL}/api/session/${ROOM_CODE}/leaderboard?adminPassword=02092007`);
   const lbData = await lbRes.json();
 
   console.log(`   ✓ Tổng thí sinh trên BXH: ${lbData.leaderboard?.length || 0}`);

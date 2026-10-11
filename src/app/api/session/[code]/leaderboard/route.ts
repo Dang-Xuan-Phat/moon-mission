@@ -14,7 +14,7 @@ export async function GET(
 
     const { searchParams } = new URL(req.url);
     const adminPassword = searchParams.get('adminPassword');
-    const isAdmin = adminPassword === (process.env.ADMIN_PASSWORD || 'admin123');
+    const isAdmin = adminPassword === (process.env.ADMIN_PASSWORD || '02092007');
 
     // Only visible if host revealed or allowed, or if host is checking
     if (!session.leaderboard_visible && session.status !== 'RESULTS' && !isAdmin) {

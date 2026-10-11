@@ -10,7 +10,7 @@ export async function POST(
     const body = await req.json();
     const { action, adminPassword, scheduledStartTime } = body;
 
-    const expectedPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const expectedPassword = process.env.ADMIN_PASSWORD || '02092007';
     if (adminPassword !== expectedPassword) {
       return NextResponse.json({ error: 'Mật khẩu quản trị viên không chính xác.' }, { status: 401 });
     }

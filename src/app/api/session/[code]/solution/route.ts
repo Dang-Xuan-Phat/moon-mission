@@ -14,7 +14,7 @@ export async function GET(
 
     const { searchParams } = new URL(req.url);
     const adminPassword = searchParams.get('adminPassword');
-    const isAdmin = adminPassword === (process.env.ADMIN_PASSWORD || 'admin123');
+    const isAdmin = adminPassword === (process.env.ADMIN_PASSWORD || '02092007');
 
     // ONLY allow access if session is in RESULTS status OR admin requests
     if (session.status !== 'RESULTS' && !session.reveal_at && !isAdmin) {

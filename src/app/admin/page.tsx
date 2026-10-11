@@ -5,7 +5,7 @@ import QRCode from 'qrcode';
 import { SessionData, LeaderboardEntry } from '@/types/game';
 
 export default function AdminPage() {
-  const [adminPassword, setAdminPassword] = useState('admin123');
+  const [adminPassword, setAdminPassword] = useState('02092007');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
 
@@ -25,7 +25,7 @@ export default function AdminPage() {
   // Authenticate Host
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPassword === 'admin123' || adminPassword.length >= 4) {
+    if (adminPassword === '02092007') {
       setIsAuthenticated(true);
       setAuthError('');
       fetchSessionDetails(roomCode);
@@ -174,7 +174,7 @@ export default function AdminPage() {
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Mật khẩu Host (Mặc định: admin123)
+                Mật khẩu Host (Mặc định: 02092007)
               </label>
               <input
                 type="password"
@@ -346,7 +346,7 @@ export default function AdminPage() {
         {/* Right Col: Classroom Projection QR & Link */}
         <div className="glass-panel p-6 rounded-2xl flex flex-col items-center text-center space-y-4">
           <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">
-            Chiếu Lên Màn Hình Cho Lớp Quét
+            MÃ QR PHÒNG
           </h3>
 
           {qrUrl ? (

@@ -63,21 +63,25 @@ export class SessionManager {
     const code = (customCode?.trim().toUpperCase() || this.generateCode()).slice(0, 6);
 
     if (isSupabaseServerConfigured && supabaseServer) {
-      const { data, error } = await supabaseServer
-        .from('sessions')
-        .insert({
-          code,
-          status: 'LOBBY',
-          join_locked: false,
-          is_test: isTest,
-        })
-        .select()
-        .single();
+      try {
+        const { data, error } = await supabaseServer
+          .from('sessions')
+          .insert({
+            code,
+            status: 'LOBBY',
+            join_locked: false,
+            is_test: isTest,
+          })
+          .select()
+          .single();
 
-      if (error) {
-        throw new Error(`Lỗi tạo phòng Supabase: ${error.message}`);
+        if (!error && data) {
+          return data as SessionData;
+        }
+        console.warn('Supabase createSession warning, falling back to in-memory store:', error?.message);
+      } catch (err: any) {
+        console.warn('Supabase createSession exception, falling back to in-memory store:', err.message);
       }
-      return data as SessionData;
     }
 
     // In-memory fallback
@@ -176,33 +180,36 @@ export class SessionManager {
     }
 
     if (isSupabaseServerConfigured && supabaseServer) {
-      // Check existing player with same name
-      const { data: existingPlayer } = await supabaseServer
-        .from('players')
-        .select('*')
-        .eq('session_id', session.id)
-        .eq('display_name', cleanName)
-        .maybeSingle();
+      try {
+        // Check existing player with same name
+        const { data: existingPlayer } = await supabaseServer
+          .from('players')
+          .select('*')
+          .eq('session_id', session.id)
+          .eq('display_name', cleanName)
+          .maybeSingle();
 
-      if (existingPlayer) {
-        return { player: existingPlayer as PlayerData, session };
+        if (existingPlayer) {
+          return { player: existingPlayer as PlayerData, session };
+        }
+
+        const { data: newPlayer, error } = await supabaseServer
+          .from('players')
+          .insert({
+            session_id: session.id,
+            display_name: cleanName,
+            join_token_hash: `token_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          })
+          .select()
+          .single();
+
+        if (!error && newPlayer) {
+          return { player: newPlayer as PlayerData, session };
+        }
+        console.warn('Supabase join warning, falling back to in-memory store:', error?.message);
+      } catch (err: any) {
+        console.warn('Supabase join exception, falling back to in-memory store:', err.message);
       }
-
-      const { data: newPlayer, error } = await supabaseServer
-        .from('players')
-        .insert({
-          session_id: session.id,
-          display_name: cleanName,
-          join_token_hash: `token_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        throw new Error(`Không thể tham gia phòng: ${error.message}`);
-      }
-
-      return { player: newPlayer as PlayerData, session };
     }
 
     // In-memory
@@ -294,28 +301,32 @@ export class SessionManager {
     const nowIso = new Date().toISOString();
 
     if (isSupabaseServerConfigured && supabaseServer) {
-      const { data, error } = await supabaseServer
-        .from('submissions')
-        .upsert(
-          {
-            session_id: sessionId,
-            player_id: playerId,
-            ordered_item_ids: orderedItemIds,
-            error_score: errorScore,
-            survival_score: survivalScore,
-            status,
-            variant_id: variantId,
-            submitted_at: nowIso,
-          },
-          { onConflict: 'session_id,player_id' }
-        )
-        .select()
-        .single();
+      try {
+        const { data, error } = await supabaseServer
+          .from('submissions')
+          .upsert(
+            {
+              session_id: sessionId,
+              player_id: playerId,
+              ordered_item_ids: orderedItemIds,
+              error_score: errorScore,
+              survival_score: survivalScore,
+              status,
+              variant_id: variantId,
+              submitted_at: nowIso,
+            },
+            { onConflict: 'session_id,player_id' }
+          )
+          .select()
+          .single();
 
-      if (error) {
-        throw new Error(`Lỗi nộp bài Supabase: ${error.message}`);
+        if (!error && data) {
+          return data as SubmissionData;
+        }
+        console.warn('Supabase submit warning, falling back to in-memory store:', error?.message);
+      } catch (err: any) {
+        console.warn('Supabase submit exception, falling back to in-memory store:', err.message);
       }
-      return data as SubmissionData;
     }
 
     let sessionSubmissions = memStore.submissions.get(sessionId);
@@ -428,17 +439,21 @@ export class SessionManager {
     }
 
     if (isSupabaseServerConfigured && supabaseServer) {
-      const { data, error } = await supabaseServer
-        .from('sessions')
-        .update(updates)
-        .eq('id', session.id)
-        .select()
-        .single();
+      try {
+        const { data, error } = await supabaseServer
+          .from('sessions')
+          .update(updates)
+          .eq('id', session.id)
+          .select()
+          .single();
 
-      if (error) {
-        throw new Error(`Lỗi cập nhật phòng: ${error.message}`);
+        if (!error && data) {
+          return data as SessionData;
+        }
+        console.warn('Supabase updateControls warning, falling back to in-memory store:', error?.message);
+      } catch (err: any) {
+        console.warn('Supabase updateControls exception, falling back to in-memory store:', err.message);
       }
-      return data as SessionData;
     }
 
     // In-memory

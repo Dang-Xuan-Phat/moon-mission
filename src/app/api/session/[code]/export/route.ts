@@ -14,7 +14,7 @@ export async function GET(
 
     const { searchParams } = new URL(req.url);
     const adminPassword = searchParams.get('adminPassword');
-    const expectedPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const expectedPassword = process.env.ADMIN_PASSWORD || '02092007';
 
     if (adminPassword !== expectedPassword) {
       return NextResponse.json({ error: 'Mật khẩu quản trị viên không chính xác.' }, { status: 401 });
