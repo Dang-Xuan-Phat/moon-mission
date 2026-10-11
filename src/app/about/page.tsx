@@ -39,15 +39,15 @@ export default function AboutPage() {
         {/* Hall & Watson Study Section */}
         <div className="glass-panel p-6 sm:p-8 rounded-2xl space-y-4">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <span>🧠</span> Nghiên cứu Ra Quyết Định Nhóm (Hall & Watson, 1970)
+            <span>🧠</span>  Thử Thách Cách Bạn Tư Duy
           </h2>
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Năm 1970, hai nhà nghiên cứu Jay Hall và W. H. Watson đã xuất bản công trình đột phá: 
-            <em> “The Effects of a Normative Intervention on Group Decision-Making Performance” </em> 
-            trên tạp chí Human Relations. Họ đã sử dụng bài tập sinh tồn Mặt Trăng này để chứng minh hiện tượng:
+            <em>“Nhiệm vụ Mặt Trăng”</em> không chỉ yêu cầu người chơi xếp hạng 15 vật phẩm. Mỗi lựa chọn đều đòi hỏi phân tích tình huống, 
+            so sánh phương án, kết nối thông tin và dự đoán kết quả. Khi đối chiếu với phương án tham khảo, người chơi có thể nhận ra 
+            cách mình hình thành quyết định, kiểm tra lại suy luận và điều chỉnh chiến lược khi những giả định ban đầu không còn phù hợp.
           </p>
           <blockquote className="border-l-4 border-cyan-400 pl-4 py-1 text-cyan-200 italic text-sm">
-            “Khi các cá nhân trao đổi và cộng tác đúng phương pháp, quyết định chung của nhóm thường đạt độ chính xác cao hơn điểm số trung bình của từng cá nhân riêng lẻ.”
+            “Điều quan trọng không chỉ là bạn chọn gì, mà là bạn đã suy nghĩ như thế nào để đi đến lựa chọn đó.”
           </blockquote>
         </div>
 
