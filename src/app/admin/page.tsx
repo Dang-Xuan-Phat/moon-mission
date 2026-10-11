@@ -5,9 +5,10 @@ import QRCode from 'qrcode';
 import { SessionData, LeaderboardEntry } from '@/types/game';
 
 export default function AdminPage() {
-  const [adminPassword, setAdminPassword] = useState('02092007');
+  const [adminPassword, setAdminPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Host room state
   const [roomCode, setRoomCode] = useState('NASA01');
@@ -22,15 +23,30 @@ export default function AdminPage() {
 
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Authenticate Host
-  const handleLogin = (e: React.FormEvent) => {
+  // Authenticate Host securely via server API
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPassword === '02092007') {
-      setIsAuthenticated(true);
-      setAuthError('');
-      fetchSessionDetails(roomCode);
-    } else {
-      setAuthError('Mật khẩu quản trị viên không chính xác.');
+    setAuthError('');
+    setIsLoggingIn(true);
+
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword }),
+      });
+
+      if (res.ok) {
+        setIsAuthenticated(true);
+        fetchSessionDetails(roomCode);
+      } else {
+        const data = await res.json();
+        setAuthError(data.error || 'Mật khẩu quản trị viên không chính xác.');
+      }
+    } catch {
+      setAuthError('Không thể kết nối đến máy chủ.');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -174,13 +190,13 @@ export default function AdminPage() {
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Mật khẩu Host (Mặc định: 02092007)
+                Mật khẩu Host
               </label>
               <input
                 type="password"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
-                placeholder="Nhập mật khẩu..."
+                placeholder="Nhập mật khẩu Host..."
                 className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-cyan-400"
                 required
               />
@@ -188,9 +204,10 @@ export default function AdminPage() {
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-rose-500 to-indigo-600 shadow-lg hover:scale-105 transition"
+              disabled={isLoggingIn}
+              className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-rose-500 to-indigo-600 shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 transition"
             >
-              Đăng Nhập Bảng Điều Khiển
+              {isLoggingIn ? 'Đang xác thực...' : 'Đăng Nhập Bảng Điều Khiển'}
             </button>
           </form>
         </div>
