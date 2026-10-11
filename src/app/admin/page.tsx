@@ -392,28 +392,28 @@ export default function AdminPage() {
 
           {/* QR Display Container - High Contrast for Classroom Projector */}
           {qrSource === 'dynamic' ? (
-            <div className="p-3.5 bg-white rounded-2xl border-2 border-cyan-400 shadow-[0_0_30px_rgba(94,235,255,0.3)] flex items-center justify-center transition-all hover:scale-[1.02]">
+            <div className="w-64 h-64 p-3 bg-white rounded-2xl border-2 border-cyan-400 shadow-[0_0_35px_rgba(94,235,255,0.35)] flex items-center justify-center transition-all hover:scale-[1.02]">
               <QRCodeSVG
                 value={joinUrl || (typeof window !== 'undefined' ? `${window.location.origin}/join?room=${roomCode}` : `https://moon-mission.vercel.app/join?room=${roomCode}`)}
-                size={216}
+                size={232}
                 bgColor="#FFFFFF"
                 fgColor="#070B1A"
                 level="H"
                 includeMargin={false}
                 imageSettings={{
                   src: "/assets/team-chatgpt-logo.png",
-                  height: 42,
-                  width: 42,
+                  height: 46,
+                  width: 46,
                   excavate: true,
                 }}
               />
             </div>
           ) : (
-            <div className="p-3 bg-white rounded-2xl border-2 border-pink-400 shadow-[0_0_30px_rgba(244,63,94,0.3)] flex items-center justify-center transition-all hover:scale-[1.02]">
+            <div className="w-64 h-64 p-2.5 bg-white rounded-2xl border-2 border-pink-400 shadow-[0_0_35px_rgba(244,63,94,0.35)] flex items-center justify-center transition-all hover:scale-[1.02]">
               <img
                 src="/assets/QRCODE.png"
                 alt="Custom Room QR"
-                className="w-52 h-52 object-contain rounded-xl"
+                className="w-full h-full object-contain rounded-xl"
               />
             </div>
           )}
