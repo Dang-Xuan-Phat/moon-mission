@@ -55,12 +55,6 @@ export default function Navbar() {
               Luật chơi
             </Link>
             <Link
-              href="/team"
-              className="text-sm font-medium text-slate-300 hover:text-cyan-300 transition-colors"
-            >
-              Đội ngũ
-            </Link>
-            <Link
               href="/admin"
               className="text-sm font-medium text-indigo-300 hover:text-indigo-200 transition-colors"
             >
@@ -117,13 +111,6 @@ export default function Navbar() {
             className="block px-3 py-2 text-base font-medium text-slate-200 hover:text-cyan-300 rounded-lg hover:bg-white/5"
           >
             Luật chơi
-          </Link>
-          <Link
-            href="/team"
-            onClick={() => setIsOpen(false)}
-            className="block px-3 py-2 text-base font-medium text-slate-200 hover:text-cyan-300 rounded-lg hover:bg-white/5"
-          >
-            Đội ngũ Team ChatGPT
           </Link>
           <Link
             href="/admin"

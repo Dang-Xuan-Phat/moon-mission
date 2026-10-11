@@ -138,7 +138,13 @@ export class SessionManager {
           .eq('code', formattedCode)
           .maybeSingle();
 
-        if (data && !error) {
+        if (error) {
+          console.warn('Supabase getSession warning, falling back to in-memory store:', error.message);
+          // Only fallback to memory on genuine connection error
+        } else {
+          // Supabase responded cleanly: return data (or null if not found)
+          if (!data) return null;
+
           // Get player count
           const { count } = await supabaseServer
             .from('players')
@@ -153,10 +159,6 @@ export class SessionManager {
           // Synchronize memory cache
           memStore.sessions.set(formattedCode, fullSession);
           return fullSession;
-        }
-
-        if (error) {
-          console.warn('Supabase getSession warning, falling back to in-memory store:', error.message);
         }
       } catch (err: any) {
         console.warn('Supabase getSession exception, falling back to in-memory store:', err.message);

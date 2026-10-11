@@ -43,15 +43,12 @@ export default function Footer() {
                 <Link href="/rules" className="hover:text-cyan-300 transition-colors">Luật chơi & Cách tính điểm</Link>
               </li>
               <li>
-                <Link href="/team" className="hover:text-cyan-300 transition-colors">Thành viên Team ChatGPT</Link>
-              </li>
-              <li>
                 <Link href="/admin" className="hover:text-cyan-300 transition-colors">Bảng điều khiển Host</Link>
               </li>
             </ul>
           </div>
 
-          {/* Academic references with full links required by 11.3 */}
+          {/* Academic references */}
           <div>
             <h4 className="text-sm font-semibold text-slate-200 mb-3 tracking-wide">
               NGUỒN KHOA HỌC & CÔNG NGHỆ
@@ -65,16 +62,6 @@ export default function Footer() {
                   className="hover:text-cyan-300 transition-colors flex items-center gap-1 text-slate-300"
                 >
                   🚀 NASA StarChild: Problems in Space ↗
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://starchild.gsfc.nasa.gov/docs/StarChild/space_level2/problems_space_solution.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-cyan-300 transition-colors flex items-center gap-1 text-slate-300"
-                >
-                  🎯 NASA StarChild: Experts' Solution ↗
                 </a>
               </li>
               <li>

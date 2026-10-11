@@ -51,37 +51,12 @@ export default function AboutPage() {
           </blockquote>
         </div>
 
-        {/* Presenter Scripts */}
-        <div className="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <span>🎙️</span> Kịch Bản Gợi Ý Cho Người Dẫn Chương Trình (MC Script)
-          </h2>
-
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-rose-300 uppercase tracking-wide">
-              1. Script mở đầu (60 – 90 giây trước khi chơi)
-            </h3>
-            <p className="text-slate-300 text-xs sm:text-sm bg-slate-900/60 p-4 rounded-xl border border-slate-800 leading-relaxed italic">
-              “Trước khi vào phần lý thuyết, team ChatGPT muốn thử một chuyện nhỏ với cả lớp: nếu phải sinh tồn trên Mặt Trăng, mọi người có biết cái gì cần giữ lại đầu tiên không? Tụi mình sẽ cùng chơi một nhiệm vụ dựa trên bài tập của NASA có tên ‘Những vấn đề trong không gian’ (Problems in Space), với đủ 15 vật phẩm và đáp án chuyên gia để đối chiếu. Trong 10 phút, mỗi bạn tự xếp hạng tất cả vật phẩm từ quan trọng nhất đến ít quan trọng nhất. Không có đáp án lộ trước, cũng không phải thi kiến thức chuyên sâu về vũ trụ. Bọn mình muốn mọi người chú ý cách bản thân suy nghĩ, chọn thứ tự ưu tiên và ra quyết định khi gặp một tình huống lạ. Chơi xong web sẽ chấm điểm, bật BXH và trả kết quả rất... có cá tính. Mời mọi người quét mã QR, nhập tên và chờ bắt đầu cùng lúc nha!”
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-cyan-300 uppercase tracking-wide">
-              2. Script chốt sau game (sau khi mở kết quả)
-            </h3>
-            <p className="text-slate-300 text-xs sm:text-sm bg-slate-900/60 p-4 rounded-xl border border-slate-800 leading-relaxed italic">
-              “Giờ nhìn lại bài của mình thử nhé: món nào mọi người tưởng quan trọng nhưng NASA lại xếp rất thấp, và ngược lại? Lúc đưa ra quyết định, bạn dựa vào điều đã biết, suy luận từ môi trường Mặt Trăng, hay đơn giản là cảm giác? Chính quá trình nhận ra vấn đề, phân tích dữ kiện, so sánh khả năng và đi đến kết luận là điều tụi mình muốn kết nối với bài học về tư duy. Còn mấy status meme thì chỉ để vui thôi nha, không phải nhận xét IQ của ai đâu!”
-            </p>
-          </div>
-        </div>
-
-        {/* Links to original sources */}
+        {/* Links to original sources (without spoiling the solution) */}
         <div className="glass-panel p-6 sm:p-8 rounded-2xl space-y-4">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <span>🔗</span> Liên Kết Tài Liệu Gốc Trực Tiếp
+            <span>🔗</span> Liên Kết Tài Liệu Khoa Học
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
             <a
               href="https://starchild.gsfc.nasa.gov/docs/StarChild/space_level2/problems_space.html"
               target="_blank"
@@ -89,15 +64,6 @@ export default function AboutPage() {
               className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition-colors flex items-center justify-between"
             >
               <span>NASA StarChild: Problems in Space</span>
-              <span>↗</span>
-            </a>
-            <a
-              href="https://starchild.gsfc.nasa.gov/docs/StarChild/space_level2/problems_space_solution.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition-colors flex items-center justify-between"
-            >
-              <span>NASA StarChild: Experts' Solution</span>
               <span>↗</span>
             </a>
             <a

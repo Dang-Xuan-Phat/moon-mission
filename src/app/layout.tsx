@@ -9,7 +9,12 @@ export const metadata: Metadata = {
   description:
     'Web game cá nhân xếp hạng 15 vật phẩm sinh tồn trên Mặt Trăng theo bài toán nổi tiếng của NASA StarChild. Thuyết trình tương tác 150+ người.',
   icons: {
-    icon: '/assets/team-chatgpt-logo.png',
+    icon: [
+      { url: '/assets/team-chatgpt-logo.png' },
+      { url: '/icon.png' },
+    ],
+    shortcut: '/assets/team-chatgpt-logo.png',
+    apple: '/assets/team-chatgpt-logo.png',
   },
 };
 

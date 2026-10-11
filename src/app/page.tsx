@@ -79,39 +79,6 @@ export default function HomePage() {
             🛡️ Bảng Điều Khiển Host
           </Link>
         </div>
-
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left">
-          <div className="glass-panel p-5 rounded-xl border border-indigo-500/20">
-            <div className="text-2xl mb-2">⚖️</div>
-            <h3 className="font-bold text-white text-sm mb-1">Chuẩn Chuyên Gia NASA</h3>
-            <p className="text-xs text-slate-400">
-              Đối chiếu trực tiếp với đáp án chính thức từ NASA StarChild & nghiên cứu ra quyết định của Hall & Watson (1970).
-            </p>
-          </div>
-          <div className="glass-panel p-5 rounded-xl border border-indigo-500/20">
-            <div className="text-2xl mb-2">⚡</div>
-            <h3 className="font-bold text-white text-sm mb-1">Đồng Bộ Thời Gian Thực</h3>
-            <p className="text-xs text-slate-400">
-              Hỗ trợ hơn 150 người cùng tham gia, timer đồng bộ theo chuẩn máy chủ và chống gian lận chỉnh giờ thiết bị.
-            </p>
-          </div>
-          <div className="glass-panel p-5 rounded-xl border border-indigo-500/20">
-            <div className="text-2xl mb-2">🐱</div>
-            <h3 className="font-bold text-white text-sm mb-1">Meme & Cà Khịa Gen Z</h3>
-            <p className="text-xs text-slate-400">
-              15 phiên bản bình luận hài hước độc quyền cùng 3 linh vật mèo meme: Sống, Sống Hấp Hối và Hẹo.
-            </p>
-          </div>
-        </div>
-
-        {/* Presenter Opening Script hint */}
-        <div className="mt-8 p-4 rounded-xl bg-slate-900/50 border border-slate-800 text-left text-xs text-slate-400">
-          <span className="font-semibold text-slate-300">💡 Gợi ý dành cho MC / Thuyết trình:</span>
-          <p className="mt-1 italic">
-            “Trước khi vào phần lý thuyết, team ChatGPT muốn thử một chuyện nhỏ với cả lớp: nếu phải sinh tồn trên Mặt Trăng, mọi người có biết cái gì cần giữ lại đầu tiên không? Mời mọi người bấm tham gia hoặc quét mã QR!”
-          </p>
-        </div>
       </div>
     </div>
   );

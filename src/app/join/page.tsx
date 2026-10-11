@@ -135,7 +135,7 @@ function JoinContent() {
                 maxLength={30}
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="VD: Hoàng Long - Tổ 1"
+                placeholder="VD: Hoàng Long"
                 className="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white text-base focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                 required
               />
