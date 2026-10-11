@@ -61,49 +61,67 @@ export class SessionManager {
    */
   static async createSession(customCode?: string, isTest = false): Promise<SessionData> {
     const code = (customCode?.trim().toUpperCase() || this.generateCode()).slice(0, 6);
+    let sessionData: SessionData | null = null;
 
     if (isSupabaseServerConfigured && supabaseServer) {
       try {
         const { data, error } = await supabaseServer
           .from('sessions')
-          .insert({
-            code,
-            status: 'LOBBY',
-            join_locked: false,
-            is_test: isTest,
-          })
+          .upsert(
+            {
+              code,
+              status: 'LOBBY',
+              join_locked: false,
+              is_test: isTest,
+              start_at: null,
+              end_at: null,
+              reveal_at: null,
+              leaderboard_visible: false,
+            },
+            { onConflict: 'code' }
+          )
           .select()
           .single();
 
         if (!error && data) {
-          return data as SessionData;
+          sessionData = data as SessionData;
+        } else if (error) {
+          console.warn('Supabase createSession warning, falling back to in-memory store:', error?.message);
         }
-        console.warn('Supabase createSession warning, falling back to in-memory store:', error?.message);
       } catch (err: any) {
         console.warn('Supabase createSession exception, falling back to in-memory store:', err.message);
       }
     }
 
-    // In-memory fallback
-    const newSession: SessionData = {
-      id: `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      code,
-      status: 'LOBBY',
-      join_locked: false,
-      is_test: isTest,
-      start_at: null,
-      end_at: null,
-      reveal_at: null,
-      leaderboard_visible: false,
-      created_at: new Date().toISOString(),
-    };
+    if (!sessionData) {
+      // In-memory fallback
+      sessionData = {
+        id: `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        code,
+        status: 'LOBBY',
+        join_locked: false,
+        is_test: isTest,
+        start_at: null,
+        end_at: null,
+        reveal_at: null,
+        leaderboard_visible: false,
+        created_at: new Date().toISOString(),
+      };
+    }
 
-    memStore.sessions.set(code, newSession);
-    memStore.players.set(newSession.id, []);
-    memStore.drafts.set(newSession.id, new Map());
-    memStore.submissions.set(newSession.id, new Map());
+    // Always keep in-memory store synchronized
+    memStore.sessions.set(code, sessionData);
+    if (!memStore.players.has(sessionData.id)) {
+      memStore.players.set(sessionData.id, []);
+    }
+    if (!memStore.drafts.has(sessionData.id)) {
+      memStore.drafts.set(sessionData.id, new Map());
+    }
+    if (!memStore.submissions.has(sessionData.id)) {
+      memStore.submissions.set(sessionData.id, new Map());
+    }
 
-    return newSession;
+    return sessionData;
   }
 
   /**
@@ -113,26 +131,39 @@ export class SessionManager {
     const formattedCode = code.trim().toUpperCase();
 
     if (isSupabaseServerConfigured && supabaseServer) {
-      const { data, error } = await supabaseServer
-        .from('sessions')
-        .select('*')
-        .eq('code', formattedCode)
-        .maybeSingle();
+      try {
+        const { data, error } = await supabaseServer
+          .from('sessions')
+          .select('*')
+          .eq('code', formattedCode)
+          .maybeSingle();
 
-      if (error || !data) return null;
+        if (data && !error) {
+          // Get player count
+          const { count } = await supabaseServer
+            .from('players')
+            .select('*', { count: 'exact', head: true })
+            .eq('session_id', data.id);
 
-      // Get player count
-      const { count } = await supabaseServer
-        .from('players')
-        .select('*', { count: 'exact', head: true })
-        .eq('session_id', data.id);
+          const fullSession: SessionData = {
+            ...data,
+            player_count: count ?? 0,
+          };
 
-      return {
-        ...data,
-        player_count: count ?? 0,
-      } as SessionData;
+          // Synchronize memory cache
+          memStore.sessions.set(formattedCode, fullSession);
+          return fullSession;
+        }
+
+        if (error) {
+          console.warn('Supabase getSession warning, falling back to in-memory store:', error.message);
+        }
+      } catch (err: any) {
+        console.warn('Supabase getSession exception, falling back to in-memory store:', err.message);
+      }
     }
 
+    // Fallback to in-memory store
     const session = memStore.sessions.get(formattedCode);
     if (!session) return null;
 
