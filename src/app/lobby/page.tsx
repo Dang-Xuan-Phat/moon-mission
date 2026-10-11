@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import QRCode from 'qrcode';
+import { QRCodeSVG } from 'qrcode.react';
 import { SessionData } from '@/types/game';
 
 function LobbyContent() {
@@ -14,7 +14,6 @@ function LobbyContent() {
   const [session, setSession] = useState<SessionData | null>(null);
   const [playerName, setPlayerName] = useState<string>('');
   const [playerCount, setPlayerCount] = useState<number>(1);
-  const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [countdownSeconds, setCountdownSeconds] = useState<number | null>(null);
@@ -28,19 +27,6 @@ function LobbyContent() {
     if (!roomCode) {
       router.push('/join');
       return;
-    }
-
-    // Generate QR code for sharing
-    if (typeof window !== 'undefined') {
-      const joinUrl = `${window.location.origin}/join?room=${roomCode}`;
-      QRCode.toDataURL(joinUrl, {
-        margin: 2,
-        width: 180,
-        color: {
-          dark: '#070B1A',
-          light: '#5EEBFF',
-        },
-      }).then((url) => setQrDataUrl(url)).catch(console.error);
     }
 
     // Fetch session initial state and poll
@@ -165,15 +151,16 @@ function LobbyContent() {
 
           {/* QR Code and Share link */}
           <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-            {qrDataUrl && (
-              <div className="p-2 rounded-xl bg-cyan-950 border border-cyan-500/40 shadow-md flex-shrink-0">
-                <img
-                  src={qrDataUrl}
-                  alt={`QR code phòng ${roomCode}`}
-                  className="w-32 h-32 rounded-lg"
-                />
-              </div>
-            )}
+            <div className="p-2.5 bg-white rounded-xl border border-cyan-400 shadow-md flex-shrink-0 flex items-center justify-center">
+              <QRCodeSVG
+                value={typeof window !== 'undefined' ? `${window.location.origin}/join?room=${roomCode}` : `https://moon-mission.vercel.app/join?room=${roomCode}`}
+                size={120}
+                bgColor="#FFFFFF"
+                fgColor="#070B1A"
+                level="M"
+                includeMargin={false}
+              />
+            </div>
             <div className="space-y-2 text-center sm:text-left flex-1">
               <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
                 Mời bạn bè & Lớp học
