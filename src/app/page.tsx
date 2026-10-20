@@ -38,7 +38,7 @@ export default function HomePage() {
             </span>
           </h1>
           <p className="text-sm sm:text-base text-cyan-400 font-mono tracking-widest uppercase">
-            NASA STARCHILD: PROBLEMS IN SPACE • 150+ PHI HÀNH GIA
+            PHI HÀNH ĐOÀN QTL51A
           </p>
         </div>
 

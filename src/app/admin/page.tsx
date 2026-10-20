@@ -409,11 +409,11 @@ export default function AdminPage() {
               />
             </div>
           ) : (
-            <div className="w-64 h-64 p-2.5 bg-white rounded-2xl border-2 border-pink-400 shadow-[0_0_35px_rgba(244,63,94,0.35)] flex items-center justify-center transition-all hover:scale-[1.02]">
+            <div className="w-64 h-64 bg-white rounded-2xl border-2 border-pink-400 shadow-[0_0_35px_rgba(244,63,94,0.35)] flex items-center justify-center transition-all hover:scale-[1.02] overflow-hidden">
               <img
                 src="/assets/QRCODE.png"
                 alt="Custom Room QR"
-                className="w-full h-full object-contain rounded-xl"
+                className="w-full h-full object-cover"
               />
             </div>
           )}
