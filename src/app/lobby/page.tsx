@@ -63,7 +63,7 @@ function LobbyContent() {
     };
 
     checkState();
-    pollIntervalRef.current = setInterval(checkState, 2000);
+    pollIntervalRef.current = setInterval(checkState, 5000); // 5s: giảm tải khi 150 người chờ
 
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);

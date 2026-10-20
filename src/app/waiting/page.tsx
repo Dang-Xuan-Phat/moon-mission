@@ -41,7 +41,7 @@ function WaitingContent() {
     };
 
     checkSessionState();
-    pollIntervalRef.current = setInterval(checkSessionState, 2500);
+    pollIntervalRef.current = setInterval(checkSessionState, 7000); // 7s: giảm 64% tải Supabase, không ảnh hưởng UX
 
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
