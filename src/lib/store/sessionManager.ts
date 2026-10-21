@@ -269,6 +269,30 @@ export class SessionManager {
   }
 
   /**
+   * Remove a player from session (called on browser unload / explicit leave)
+   */
+  static async removePlayer(code: string, playerId: string): Promise<void> {
+    const session = await this.getSession(code);
+    if (!session) return;
+
+    if (isSupabaseServerConfigured && supabaseServer) {
+      await supabaseServer
+        .from('players')
+        .delete()
+        .eq('id', playerId)
+        .eq('session_id', session.id);
+      return;
+    }
+
+    // In-memory fallback
+    const playerList = memStore.players.get(session.id) || [];
+    memStore.players.set(
+      session.id,
+      playerList.filter((p) => p.id !== playerId)
+    );
+  }
+
+  /**
    * Save draft ranking (debounced autosave)
    */
   static async saveDraft(
@@ -465,6 +489,16 @@ export class SessionManager {
         updates.end_at = null;
         updates.reveal_at = null;
         updates.leaderboard_visible = false;
+        // Xóa toàn bộ players, drafts, submissions của phiên này
+        if (isSupabaseServerConfigured && supabaseServer) {
+          await supabaseServer.from('submissions').delete().eq('session_id', session.id);
+          await supabaseServer.from('draft_rankings').delete().eq('session_id', session.id);
+          await supabaseServer.from('players').delete().eq('session_id', session.id);
+        } else {
+          memStore.players.set(session.id, []);
+          memStore.drafts.set(session.id, new Map());
+          memStore.submissions.set(session.id, new Map());
+        }
         break;
       case 'archive':
         updates.status = 'ARCHIVED';

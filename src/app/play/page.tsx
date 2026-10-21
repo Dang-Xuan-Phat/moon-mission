@@ -25,6 +25,7 @@ function PlayContent() {
   const sessionStatusPollRef = useRef<NodeJS.Timeout | null>(null);
   const serverOffsetRef = useRef<number>(0);
   const endTimeRef = useRef<number | null>(null);
+  const pendingDragItemsRef = useRef<typeof items>([]);
 
   // 1. Initialize Player & Session & Items
   useEffect(() => {
@@ -230,11 +231,17 @@ function PlayContent() {
 
     setDraggedIndex(index);
     setItems(newItems);
-    triggerAutosave(newItems);
+    // Lưu vào ref, KHÔNG gọi API — tránh spam request khi đang kéo
+    pendingDragItemsRef.current = newItems;
   };
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
+    // Chỉ autosave 1 lần khi thả tay
+    if (pendingDragItemsRef.current.length === 15) {
+      triggerAutosave(pendingDragItemsRef.current);
+      pendingDragItemsRef.current = [];
+    }
   };
 
   // 6. Submit logic

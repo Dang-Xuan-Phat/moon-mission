@@ -63,10 +63,20 @@ function LobbyContent() {
     };
 
     checkState();
-    pollIntervalRef.current = setInterval(checkState, 5000); // 5s: giảm tải khi 150 người chờ
+    pollIntervalRef.current = setInterval(checkState, 5000);
+
+    // Báo server khi user thoát trang — dùng sendBeacon vì fetch không đáng tin cậy lúc unload
+    const playerId = localStorage.getItem('moon_player_id');
+    const handleUnload = () => {
+      if (!playerId || !roomCode) return;
+      const blob = new Blob([JSON.stringify({ playerId })], { type: 'application/json' });
+      navigator.sendBeacon(`/api/session/${roomCode}/leave`, blob);
+    };
+    window.addEventListener('beforeunload', handleUnload);
 
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      window.removeEventListener('beforeunload', handleUnload);
     };
   }, [roomCode, router]);
 
