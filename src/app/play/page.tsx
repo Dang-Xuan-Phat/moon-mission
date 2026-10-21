@@ -498,38 +498,9 @@ function PlayContent() {
 }
 
 export default function PlayPage() {
-  const [items, setItems] = useState<string[]>([]);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Hàm đồng bộ bản nháp có Debounce 1.5s
-  const saveDraftRanking = useCallback((newItems: string[]) => {
-    // 1. Lưu ngay vào bộ nhớ máy người chơi (offline resilience)
-    if (sessionCode) {
-      localStorage.setItem(`draft_${sessionCode}`, JSON.stringify(newItems));
-    }
-
-    // 2. Hủy đếm giờ cũ nếu người chơi tiếp tục kéo thả
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    // 3. Đợi 1.5s không thao tác mới gửi lên server
-    timeoutRef.current = setTimeout(async () => {
-      try {
-        await fetch(`/api/session/${sessionCode}/draft`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ playerId, items: newItems }),
-        });
-      } catch (err) {
-        console.error('Lỗi lưu nháp:', err);
-      }
-    }, 1500);
-  }, [sessionCode, playerId]);
-
-  // Gọi hàm này trong sự kiện Reorder/Drag-End
-  const handleReorder = (updatedItems: string[]) => {
-    setItems(updatedItems);
-    saveDraftRanking(updatedItems);
-  };
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-400">Đang tải phòng thi...</div>}>
+      <PlayContent />
+    </Suspense>
+  );
 }
