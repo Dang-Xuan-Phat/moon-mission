@@ -34,7 +34,11 @@ function PlayContent() {
       return;
     }
 
-    const savedPlayerId = localStorage.getItem('moon_player_id');
+    // sessionStorage = per-tab (fix collision khi nhiều tab cùng tên)
+    // fallback localStorage cho user cũ chưa re-join
+    const savedPlayerId =
+      sessionStorage.getItem('moon_player_id') ||
+      localStorage.getItem('moon_player_id');
     if (!savedPlayerId) {
       router.push(`/join?room=${roomCode}`);
       return;
@@ -118,6 +122,19 @@ function PlayContent() {
     };
 
     initializeGame();
+
+    // Báo server khi user thoát tab trong lúc đang chơi
+    const handleUnload = () => {
+      const pid = sessionStorage.getItem('moon_player_id') || localStorage.getItem('moon_player_id');
+      if (!pid || !roomCode) return;
+      const blob = new Blob([JSON.stringify({ playerId: pid })], { type: 'application/json' });
+      navigator.sendBeacon(`/api/session/${roomCode}/leave`, blob);
+    };
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+    };
   }, [roomCode, router]);
 
   // 2. Synchronized Countdown Timer

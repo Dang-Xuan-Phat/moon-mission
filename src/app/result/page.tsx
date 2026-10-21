@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -32,7 +32,7 @@ function ResultContent() {
       return;
     }
 
-    const savedPlayerId = localStorage.getItem('moon_player_id');
+    const savedPlayerId = sessionStorage.getItem('moon_player_id') || localStorage.getItem('moon_player_id');
     if (!savedPlayerId) {
       router.push(`/join?room=${roomCode}`);
       return;
@@ -441,3 +441,4 @@ export default function ResultPage() {
     </Suspense>
   );
 }
+

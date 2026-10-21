@@ -61,10 +61,10 @@ function JoinContent() {
         throw new Error(data.error || 'Không thể tham gia phòng.');
       }
 
-      // Save credentials for reconnect
+      // Save credentials — dùng sessionStorage cho player_id để mỗi tab có ID riêng
       localStorage.setItem('moon_session_code', cleanCode);
       localStorage.setItem('moon_session_id', data.session.id);
-      localStorage.setItem('moon_player_id', data.player.id);
+      sessionStorage.setItem('moon_player_id', data.player.id);  // per-tab: không bị ghi đè khi nhiều tab
       localStorage.setItem('moon_player_name', data.player.display_name);
 
       // Route according to session status

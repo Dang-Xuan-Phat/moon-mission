@@ -66,7 +66,7 @@ function LobbyContent() {
     pollIntervalRef.current = setInterval(checkState, 5000);
 
     // Báo server khi user thoát trang — dùng sendBeacon vì fetch không đáng tin cậy lúc unload
-    const playerId = localStorage.getItem('moon_player_id');
+    const playerId = sessionStorage.getItem('moon_player_id') || localStorage.getItem('moon_player_id');
     const handleUnload = () => {
       if (!playerId || !roomCode) return;
       const blob = new Blob([JSON.stringify({ playerId })], { type: 'application/json' });
