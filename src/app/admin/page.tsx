@@ -260,6 +260,67 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* Live Room Status Bar */}
+      {session && (
+        <div className="grid grid-cols-3 gap-3">
+          {/* Số người trong phòng */}
+          <div className="glass-panel p-4 rounded-2xl flex items-center gap-3 border border-cyan-500/20">
+            <div className="relative">
+              <span className="text-2xl">👥</span>
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse border-2 border-slate-900" />
+            </div>
+            <div>
+              <p className="text-[11px] text-slate-400 leading-none mb-1">Đang trong phòng</p>
+              <p className="text-3xl font-black font-mono text-cyan-300 leading-none">
+                {session.player_count ?? 0}
+              </p>
+            </div>
+          </div>
+
+          {/* Số bài đã nộp */}
+          <div className="glass-panel p-4 rounded-2xl flex items-center gap-3 border border-indigo-500/20">
+            <span className="text-2xl">📝</span>
+            <div>
+              <p className="text-[11px] text-slate-400 leading-none mb-1">Đã nộp bài</p>
+              <p className="text-3xl font-black font-mono text-indigo-300 leading-none">
+                {leaderboard.length}
+                {(session.player_count ?? 0) > 0 && (
+                  <span className="text-sm font-normal text-slate-500 ml-1">
+                    / {session.player_count}
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* Trạng thái phòng */}
+          <div className="glass-panel p-4 rounded-2xl flex items-center gap-3 border border-slate-700">
+            <span className="text-2xl">
+              {session.status === 'LOBBY'     && '🛸'}
+              {session.status === 'RUNNING'   && '🚀'}
+              {session.status === 'RESULTS'   && '🏆'}
+              {session.status === 'COUNTDOWN' && '⏳'}
+              {session.status === 'ARCHIVED'  && '📦'}
+            </span>
+            <div>
+              <p className="text-[11px] text-slate-400 leading-none mb-1">Trạng thái</p>
+              <p className={`text-base font-black leading-none ${
+                session.status === 'LOBBY'     ? 'text-slate-300'  :
+                session.status === 'RUNNING'   ? 'text-emerald-400':
+                session.status === 'RESULTS'   ? 'text-amber-400'  :
+                session.status === 'COUNTDOWN' ? 'text-cyan-400'   : 'text-slate-500'
+              }`}>
+                {session.status === 'LOBBY'     && 'LOBBY'}
+                {session.status === 'RUNNING'   && 'ĐANG CHƠI'}
+                {session.status === 'RESULTS'   && 'KẾT QUẢ'}
+                {session.status === 'COUNTDOWN' && 'ĐẾM NGƯỢC'}
+                {session.status === 'ARCHIVED'  && 'LƯU TRỮ'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Grid: Room Info & Controls + Projection QR */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Controls & Room Management */}
