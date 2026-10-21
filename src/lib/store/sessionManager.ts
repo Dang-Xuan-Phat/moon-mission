@@ -214,23 +214,23 @@ export class SessionManager {
 
     if (isSupabaseServerConfigured && supabaseServer) {
       try {
-        // Check existing player with same name
-        const { data: existingPlayer } = await supabaseServer
+        // Đếm xem tên này đã tồn tại bao nhiêu lần → tạo hậu tố duy nhất
+        const { data: sameNamePlayers } = await supabaseServer
           .from('players')
-          .select('*')
+          .select('display_name')
           .eq('session_id', session.id)
-          .eq('display_name', cleanName)
-          .maybeSingle();
+          .ilike('display_name', `${cleanName}%`);
 
-        if (existingPlayer) {
-          return { player: existingPlayer as PlayerData, session };
+        let uniqueName = cleanName;
+        if (sameNamePlayers && sameNamePlayers.length > 0) {
+          uniqueName = `${cleanName} (${sameNamePlayers.length + 1})`;
         }
 
         const { data: newPlayer, error } = await supabaseServer
           .from('players')
           .insert({
             session_id: session.id,
-            display_name: cleanName,
+            display_name: uniqueName,
             join_token_hash: `token_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
           })
           .select()
